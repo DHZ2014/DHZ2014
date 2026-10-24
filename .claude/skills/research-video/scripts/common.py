@@ -9,6 +9,7 @@ DEFAULTS = {
     "tts_model": "speech-2.6-hd", "voice_id": "male-qn-jingying", "speed": 1.15,
     "lead": 0.45, "tail": 0.6, "leads": {"0": 1.9}, "end_pad": 3.2,
     "digits": [],
+    "burn_subs": False,      # true：字幕烧进画面（发小红书、静音观看时用）
 }
 
 

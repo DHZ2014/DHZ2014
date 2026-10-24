@@ -58,7 +58,7 @@ bash $RV/scripts/make.sh $P tts                     # 只重做第 3 段：make.
 bash $RV/scripts/make.sh $P timing                  # 打印 C(i) 字幕时间表，画面事件就按它对齐
 ```
 
-`config.json` 可调：`voice_id`（默认 male-qn-jingying）、`speed`、`lead`/`tail`（场景首尾留白）、`leads`（场景 0 给片头留 1.9 秒）、`end_pad`（片尾卡时长）、`digits`（额外的文字替换）。
+`config.json` 可调：`voice_id`（默认 male-qn-jingying）、`speed`、`lead`/`tail`（场景首尾留白）、`leads`（场景 0 给片头留 1.9 秒）、`end_pad`（片尾卡时长）、`digits`（额外的文字替换）、`burn_subs`（`true` 时字幕烧进画面）。
 
 ## 5. 写画面 `template.html`
 
@@ -87,7 +87,7 @@ bash $RV/scripts/make.sh $P render    # 约 5–6 秒渲染 1 秒成片，83 秒
 
 ## 8. 交付
 
-`out/<项目>.mp4`、`out/<项目>.srt`（新闻风格规定画面不烧字幕；用户要发小红书且常被静音观看时，可提议烧进画面）、`qa/review_log.md`（事实核对 + 自检分数 + 已知不足）。告诉用户怎么改：口播改 `vo.json` → `tts`/`timing`，画面改 `template.html`，再 `render`。
+`out/<项目>.mp4`、`out/<项目>.srt`。新闻风格原版规定画面不烧字幕；发小红书、视频号这类常被静音观看的平台时，在 `config.json` 设 `"burn_subs": true`：字幕放在标题条下方（y≈1588，深色底条 + 强调色下划线，数字染黄），来源线自动挪到 tab 右侧，底部 220px 仍留给平台 UI。只改字幕不改口播时，沿用原来的 `audio/mix.wav`，直接 `render` 即可、`qa/review_log.md`（事实核对 + 自检分数 + 已知不足）。告诉用户怎么改：口播改 `vo.json` → `tts`/`timing`，画面改 `template.html`，再 `render`。
 
 ## 坑（实做中踩过的）
 
