@@ -1,11 +1,11 @@
 # 纸面编辑部风格：配乐 + 音效 + 旁白 → audio/mix_raw.wav
-# 在项目目录里运行（make.sh audio 会处理）。「音效」一节的时间点按 C(i)（第 i 条字幕开始）写，换研报后要按新画面改。
+# 在项目目录里运行（make.py audio 会处理）。「音效」一节的时间点按 C(i)（第 i 条字幕开始）写，换研报后要按新画面改。
 import json, os, subprocess, sys, wave
 import numpy as np
 sys.path.insert(0, os.path.join(os.environ.get('SKILL_DIR', os.path.join(os.path.dirname(__file__), '..', '..')), 'scripts', 'vendor', 'lemo'))
 import sfx as X
 SR = X.SR
-tl = json.load(open('timeline.json')); S = tl['scenes']; CAP = tl['captions']; DUR = tl['duration']
+tl = json.load(open('timeline.json', encoding='utf-8')); S = tl['scenes']; CAP = tl['captions']; DUR = tl['duration']
 C = lambda i: CAP[i]['t0']
 N = int(DUR * SR) + SR
 mus = np.zeros(N); fx = np.zeros(N); vo = np.zeros(N)

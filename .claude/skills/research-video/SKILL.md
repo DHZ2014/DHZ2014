@@ -18,10 +18,17 @@ description: 把研报、投研文章、财报解读（PDF / 文字 / 已写好�
 ## 0. 环境（每台机器一次）
 
 ```bash
-bash .claude/skills/research-video/scripts/setup.sh            # 检查依赖 + 下载字体
-bash .claude/skills/research-video/scripts/setup.sh --install  # 电脑端第一次：顺带装 playwright/numpy/scipy + Chromium
+python .claude/skills/research-video/scripts/setup.py            # 检查依赖 + 下载字体
+python .claude/skills/research-video/scripts/setup.py --install  # 电脑端第一次：顺带装 playwright/numpy/scipy + Chromium
 ```
 
+- **Windows（PowerShell）**：先装依赖，装完**重开 PowerShell**：
+  ```powershell
+  winget install Git.Git
+  winget install Python.Python.3.12
+  winget install Gyan.FFmpeg
+  ```
+  设 key 用 `setx MINIMAX_API_KEY "你的key"`（新开的窗口才生效）；PowerShell 5 不支持 `&&`，命令分行写。所有脚本都用 `python …` 运行，不需要 bash；没有 Playwright 自带的 Chromium 时，渲染器会自动改用系统自带的 Edge。
 - 需要 Python 3.9+、ffmpeg。云端 Claude Code 环境已预装 Chromium：设 `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`，并用与系统 Playwright 同版本的 Python 包（见「坑」）。
 - 配音用 MiniMax：电脑端设环境变量 `MINIMAX_API_KEY`（需要时再设 `MINIMAX_GROUP_ID`；国际站设 `MINIMAX_API_HOST=api.minimax.io`）。云端环境若配置了 MiniMax 代理注入，可以不设。
 - 下文 `$RV` 指 `.claude/skills/research-video`，`$P` 指项目目录（建议 `videos/<slug>/`）。
@@ -35,7 +42,8 @@ bash .claude/skills/research-video/scripts/setup.sh --install  # 电脑端第一
 ## 2. 结构与口播稿 `vo.json`
 
 - `vo.json` 是一个数组，**一项 = 一个场景的口播**。新闻风格的固定顺序：串联单（今天看 N 件事）→ 各条故事 → 结论 → 跟踪清单 → 片尾卡。
-- 篇幅控制（用户偏好）：内容偏长时，删掉「比例大、金额小」的次要一节（例：Aether），把利润率/现金流并入业务一节；4 条故事最合适。口播语速 1.15 时约 4.3 字/秒，6 段约 80 秒；想压到 60 秒用 1.3 或删一节。
+- **硬性要求：竖屏 9:16（1080×1920），成片不少于 65 秒**（`config.min_duration`，`timing` 和 `render` 都会检查）。口播语速 1.15 时约 4.3 字/秒，65 秒约需 250 字以上口播；6 段、80 秒左右最稳。
+- 篇幅控制（用户偏好）：内容偏长时，删掉「比例大、金额小」的次要一节（例：Aether），把利润率/现金流并入业务一节；4 条故事最合适。删减后先确认仍有 65 秒以上，不够就补结论里的解读或跟踪节点，不要靠放慢语速或拉长留白凑时长。
 - 口播里数字用中文读法（「百分之四点六」），屏上/字幕会自动转成阿拉伯数字（`scripts/common.py: cn_digits`，只转带单位的数，"一致预期""四件事"不会被改）。
 - 结论段要有「解读」的态度，而不只是复述研报：例如「增长加速主要靠中国，剔除后环比只有约 7%」「+70% 是重申，不是新消息」「剔除营运资本后 FCF 利润率约 33%」。
 
@@ -44,7 +52,7 @@ bash .claude/skills/research-video/scripts/setup.sh --install  # 电脑端第一
 照 `examples/lam-news/镜头表.md` 写 `$P/镜头表.md`：表前三行锁画风、色板、角色；每行一镜：时间段｜画面里的物（名词）｜它在做什么（动词）｜镜头｜屏上字（≤8 字）｜做法。
 
 ```bash
-bash $RV/scripts/make.sh $P lint
+python $RV/scripts/make.py $P lint
 ```
 
 常见红灯：结尾是纯字卡（改成品牌板飞回中央收尾）、单镜超过 8 秒（拆镜）、屏上数字在口播里找不到。
@@ -54,8 +62,8 @@ bash $RV/scripts/make.sh $P lint
 ```bash
 python3 $RV/scripts/new.py $P --style news          # 或 --style editorial
 # 写好 $P/vo.json（和 镜头表.md）后：
-bash $RV/scripts/make.sh $P tts                     # 只重做第 3 段：make.sh $P tts 3
-bash $RV/scripts/make.sh $P timing                  # 打印 C(i) 字幕时间表，画面事件就按它对齐
+python $RV/scripts/make.py $P tts                     # 只重做第 3 段：make.py $P tts 3
+python $RV/scripts/make.py $P timing                  # 打印 C(i) 字幕时间表，画面事件就按它对齐
 ```
 
 `config.json` 可调：`voice_id`（默认 male-qn-jingying）、`speed`、`lead`/`tail`（场景首尾留白）、`leads`（场景 0 给片头留 1.9 秒）、`end_pad`（片尾卡时长）、`digits`（额外的文字替换）、`burn_subs`（`true` 时字幕烧进画面）。
@@ -70,7 +78,7 @@ bash $RV/scripts/make.sh $P timing                  # 打印 C(i) 字幕时间�
 ## 6. 拼图自检（最关键）
 
 ```bash
-bash $RV/scripts/make.sh $P stills 1.2 9.5 15.5 22 27 33.6 43.3 48.5 53.5 59.5 68.5 82.5
+python $RV/scripts/make.py $P stills 1.2 9.5 15.5 22 27 33.6 43.3 48.5 53.5 59.5 68.5 82.5
 ```
 
 打开 `$P/qa/sheet.png` 亲自看，按 开场 / 手机可读 / 动作 / 变化 / 构图 / 贴合原材料 / 声画同步 各打 1–10 分，修最差的 3 处再出拼图，直到每项 ≥ 8。常见问题：数字和印章叠在一起、标签撞柱顶数值、徽章压眉题、大字溢出色块、下半屏空。每轮写进 `$P/qa/review_log.md`。
@@ -78,8 +86,8 @@ bash $RV/scripts/make.sh $P stills 1.2 9.5 15.5 22 27 33.6 43.3 48.5 53.5 59.5 6
 ## 7. 混音、渲染、验收
 
 ```bash
-bash $RV/scripts/make.sh $P audio     # 改 $P/mix.py 里「音效」一节的时间点（按 C(i)）后再跑
-bash $RV/scripts/make.sh $P render    # 约 5–6 秒渲染 1 秒成片，83 秒的片子约 9 分钟：放后台跑
+python $RV/scripts/make.py $P audio     # 改 $P/mix.py 里「音效」一节的时间点（按 C(i)）后再跑
+python $RV/scripts/make.py $P render    # 约 5–6 秒渲染 1 秒成片，83 秒的片子约 9 分钟：放后台跑
 ```
 
 - 响度目标 −14 LUFS（−15 左右也可接受），true peak 低于 −1 dB 为佳；看 `qa/audio-wave.png` 有无削顶和静音段。
@@ -97,6 +105,7 @@ bash $RV/scripts/make.sh $P render    # 约 5–6 秒渲染 1 秒成片，83 秒
 - 字幕时间按字数分配时，英文单词要按约 1.5 个汉字计权重，否则 "Lam Research" 这类开头会对歪；相邻字幕至少间隔 0.45 秒，防止吸附停顿后出现零时长字幕。
 - MiniMax 的 `subtitle_file`（逐字时间戳）在阿里云 OSS，云端代理访问不到，所以用 ffmpeg `silencedetect` 找停顿代替。
 - 云端用 Python Playwright 时，pip 装与系统 Node Playwright 相同的版本号（如 `playwright==1.63.0`），才能用上预装的 Chromium；不要再 `playwright install`。
+- Windows：Python 默认按 GBK 读写文件、打印中文，`make.py` 已为子进程设 `PYTHONUTF8=1`；自己写脚本读 JSON 时也要带 `encoding='utf-8'`。Windows 版 ffmpeg 不支持 `-pattern_type glob`，拼图用编号文件名 `s_%02d.png`。普通用户建不了符号链接，`build.py` 会直接引用 skill 里的字体。
 - 往 `~/.claude/skills` 写文件在云端可能被权限拦下：用仓库里的项目级 skill（就是本目录）即可。
 
 ## 更多风格

@@ -44,7 +44,7 @@
 | breaking | `#FE6B3D` | 只给突发、直播，投研片不用 |
 
 ## 字体
-Noto Sans SC 900（标题、标题条）/ 700（标签）；Barlow Condensed 800（数字、品牌）/ 600（英文副行）；IBM Plex Mono 500（日期线、来源、坐标，全大写加字距）。全部 OFL，`setup.sh` 下载到本地。标签一律中英双行，不换行。
+Noto Sans SC 900（标题、标题条）/ 700（标签）；Barlow Condensed 800（数字、品牌）/ 600（英文副行）；IBM Plex Mono 500（日期线、来源、坐标，全大写加字距）。全部 OFL，`setup.py` 下载到本地。标签一律中英双行，不换行。
 
 ## 声音
 E 小调 120 BPM 新闻主题（片头之后进拍，八分音符贝斯 + 铺底 + 每两小节一个琶音动机），旁白出现时闪避约 70%；片尾 E 大三和弦。音效：色带 whoosh、翻牌 clack、印章 thump + crash、越线 ding、故事内硬切低频 thump、清单打勾 ding。

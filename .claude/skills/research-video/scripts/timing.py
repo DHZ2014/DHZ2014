@@ -55,5 +55,7 @@ def ts(x):
 (proj / "out" / f"{proj.name}.srt").write_text(
     "".join(f"{k + 1}\n{ts(c['t0'])} --> {ts(c['t1'])}\n{c['text']}\n\n" for k, c in enumerate(caps)), encoding="utf-8")
 print(f"时长 {tl['duration']}s，{len(scenes)} 个场景，{len(caps)} 条字幕")
+if tl["duration"] < cfg["min_duration"]:
+    print(f"⚠ 时长 {tl['duration']}s 不足 {cfg['min_duration']} 秒：补充口播内容（结论解读、跟踪节点），不要靠放慢语速凑时长")
 for k, c in enumerate(caps):
     print(f"C({k}) {c['t0']:7.2f}–{c['t1']:7.2f}  {c['text']}")

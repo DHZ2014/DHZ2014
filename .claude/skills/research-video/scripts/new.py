@@ -27,6 +27,9 @@ if not (proj / "镜头表.md").exists():
     shutil.copy(SKILL / "examples" / "lam-news" / "镜头表.md", proj / "镜头表.md")
 fonts = SKILL / "fonts"
 if fonts.exists() and not (proj / "fonts").exists():
-    os.symlink(fonts, proj / "fonts")
+    try:
+        os.symlink(fonts, proj / "fonts", target_is_directory=True)
+    except OSError:          # Windows 普通用户不能建符号链接：build.py 会改为直接引用 skill 里的字体
+        pass
 (proj / ".gitignore").write_text("fonts\nindex.html\naudio/*.mp3\naudio/*.wav\nqa/\nout/*.mp4\n", encoding="utf-8")
-print(f"已建好 {proj}（风格 {a.style}）。下一步：写 vo.json 和 镜头表.md，再跑 make.sh {proj} lint")
+print(f"已建好 {proj}（风格 {a.style}）。下一步：写 vo.json 和 镜头表.md，再跑 python make.py {proj} lint")
