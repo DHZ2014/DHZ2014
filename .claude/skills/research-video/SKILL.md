@@ -31,7 +31,13 @@ python .claude/skills/research-video/scripts/setup.py --install  # 电脑端第�
   设 key 用 `setx MINIMAX_API_KEY "你的key"`（新开的窗口才生效）；PowerShell 5 不支持 `&&`，命令分行写。所有脚本都用 `python …` 运行，不需要 bash；没有 Playwright 自带的 Chromium 时，渲染器会自动改用系统自带的 Edge。
 - 需要 Python 3.9+、ffmpeg。云端 Claude Code 环境已预装 Chromium：设 `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`，并用与系统 Playwright 同版本的 Python 包（见「坑」）。
 - 配音用 MiniMax：电脑端设环境变量 `MINIMAX_API_KEY`（需要时再设 `MINIMAX_GROUP_ID`；国际站设 `MINIMAX_API_HOST=api.minimax.io`）。云端环境若配置了 MiniMax 代理注入，可以不设。
-- 下文 `$RV` 指 `.claude/skills/research-video`，`$P` 指项目目录（建议 `videos/<slug>/`）。
+- Windows 一键安装（装 Git/Python/ffmpeg、拉仓库、把本 skill 复制到 `%USERPROFILE%\.claude\skills\research-video`、装依赖和字体、提示填 MiniMax key；再运行一次即更新）：
+  ```powershell
+  irm https://raw.githubusercontent.com/DHZ2014/DHZ2014/main/.claude/skills/research-video/install.ps1 | iex
+  ```
+  只装进某个项目：先 `$env:RV_PROJECT_DIR = "D:\Finance Video"` 再运行同一行。
+- Windows 上 `python` 可能是应用商店的占位程序，一律用 `py -3` 运行脚本（如 `py -3 $RV\scripts\make.py $P lint`）。
+- 下文 `$RV` 指本 skill 所在目录（项目里的 `.claude/skills/research-video`，或用户级 `~/.claude/skills/research-video`），`$P` 指项目目录（建议 `videos/<slug>/`，Finance Video 这类项目里放在项目根下的 `videos/`）。
 
 ## 1. Digest：先读懂、再核对
 
