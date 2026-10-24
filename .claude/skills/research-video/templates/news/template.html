@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  :root { --ink: #121417; --ink2: #1B1E23; --ink3: #22262C; --acc: #F2CF1D; --accL: #F8DE4A; --accD: #D8B30C;
+    --gold: #D4B064; --paper: #F4F1E8; --olive: #6E5A1E; }
+  html, body { margin: 0; background: var(--ink); }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--ink); color: var(--paper);
+    font-family: "Noto Sans SC", sans-serif; font-weight: 700; }
+  .abs { position: absolute; }
+  .cn9 { font-family: "Noto Sans SC"; font-weight: 900; }
+  .bc { font-family: "Barlow Condensed"; font-weight: 800; }
+  .bc6 { font-family: "Barlow Condensed"; font-weight: 600; }
+  .mono { font-family: "IBM Plex Mono"; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; }
+  .scene { position: absolute; inset: 0; }
+  .content { position: absolute; inset: 0; transform-origin: 540px 800px; }
+  .streak { position: absolute; inset: 0; opacity: .5;
+    background: repeating-linear-gradient(115deg, transparent 0 140px, rgba(212,176,100,.05) 140px 146px, transparent 146px 300px); }
+  .dateline { left: 60px; top: 262px; font-size: 22px; color: var(--gold); }
+  /* 标题条 */
+  .tab { left: 60px; top: 1330px; height: 52px; line-height: 52px; padding: 0 22px; background: var(--acc); color: var(--ink);
+    font-size: 30px; white-space: nowrap; }
+  .tab .en { font-family: "Barlow Condensed"; font-weight: 800; font-size: 28px; margin-left: 10px; letter-spacing: 1px; }
+  .strap { left: 60px; top: 1382px; width: 840px; height: 150px; background: var(--paper); overflow: hidden; }
+  .strap .ln { position: absolute; left: 30px; right: 20px; top: 0; height: 150px; }
+  .strap .zh { position: absolute; top: 18px; font-family: "Noto Sans SC"; font-weight: 900; font-size: 46px; color: var(--ink); white-space: nowrap; }
+  .strap .en { position: absolute; top: 90px; font-family: "Barlow Condensed"; font-weight: 600; font-size: 30px; color: var(--olive); letter-spacing: 1px; white-space: nowrap; }
+  .strapEnd { left: 900px; top: 1382px; width: 120px; height: 150px; background: var(--ink2); border-top: 6px solid var(--acc); box-sizing: border-box;
+    text-align: center; font-size: 34px; line-height: 144px; color: var(--acc); }
+  .src { right: 60px; top: 1556px; text-align: right; opacity: .75; color: var(--gold); white-space: nowrap; }
+  .src .m { font-size: 20px; } .src .c { font-size: 22px; font-weight: 700; margin-left: 10px; }
+  /* 翻牌 */
+  .tile { position: absolute; background: var(--ink3); border-radius: 12px; }
+  .half { position: absolute; left: 0; right: 0; overflow: hidden; background: var(--ink3); }
+  .half span { position: absolute; left: 0; right: 0; text-align: center; font-family: "Barlow Condensed"; font-weight: 800; color: var(--paper); }
+  .seam { position: absolute; left: 0; right: 0; height: 4px; background: var(--ink); }
+  /* 卡片 */
+  .card { background: var(--ink2); border-top: 8px solid var(--acc); box-sizing: border-box; }
+  .eyebrow { font-size: 22px; color: var(--gold); }
+  .lbl { font-size: 40px; white-space: nowrap; }
+  .lbl .en { font-family: "Barlow Condensed"; font-weight: 600; font-size: 30px; color: #9a9588; margin-left: 12px; letter-spacing: 1px; }
+  .track { background: var(--ink3); height: 64px; }
+  .fillb { height: 64px; background: var(--paper); }
+  .badge { background: var(--acc); color: var(--ink); font-family: "Barlow Condensed"; font-weight: 800; text-align: center; border-radius: 50%; }
+  .chip { height: 80px; line-height: 80px; padding: 0 30px; border: 3px solid var(--gold); color: var(--paper); font-size: 38px; white-space: nowrap; }
+  .chip b { color: var(--acc); font-family: "Barlow Condensed"; font-weight: 800; font-size: 46px; }
+  .stamp { padding: 10px 34px; border: 6px double var(--acc); outline: 4px solid var(--acc); outline-offset: 6px; background: var(--ink);
+    color: var(--acc); white-space: nowrap; text-align: center; }
+  .stamp .zh { font-family: "Noto Sans SC"; font-weight: 900; font-size: 64px; line-height: 1.15; }
+  .stamp .en { font-family: "Barlow Condensed"; font-weight: 800; font-size: 34px; letter-spacing: 3px; }
+  .ring { border: 6px solid var(--acc); border-radius: 50%; }
+  .barv { position: absolute; background: var(--paper); }
+  .vlab { position: absolute; text-align: center; white-space: nowrap; }
+  .row { position: absolute; left: 60px; width: 960px; height: 150px; background: var(--ink2); transform-origin: 50% 0; overflow: hidden; }
+  .row .n { position: absolute; left: 0; top: 0; width: 150px; height: 150px; background: var(--acc); color: var(--ink);
+    font-family: "Barlow Condensed"; font-weight: 800; font-size: 80px; text-align: center; line-height: 150px; }
+  .row .zh { position: absolute; left: 186px; top: 22px; font-family: "Noto Sans SC"; font-weight: 900; font-size: 50px; white-space: nowrap; }
+  .row .en { position: absolute; left: 188px; top: 92px; font-family: "Barlow Condensed"; font-weight: 600; font-size: 30px; color: var(--gold); letter-spacing: 1.5px; white-space: nowrap; }
+  .row .tick { position: absolute; right: 36px; top: 37px; }
+  .glint { position: absolute; top: 0; width: 120px; height: 100%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.35), transparent); }
+  /* 品牌板 */
+  #plate { left: 0; top: 0; width: 600px; height: 200px; transform-origin: 0 0; }
+  #plate .pg { position: absolute; inset: 0; transform: skewX(-12deg); background: linear-gradient(180deg, var(--accL), var(--acc) 55%, var(--accD)); overflow: hidden; }
+  #plate .b1 { position: absolute; left: 30px; top: 0; width: 18px; height: 200px; background: var(--ink); }
+  #plate .b2 { position: absolute; left: 56px; top: 0; width: 8px; height: 200px; background: #9c7b25; }
+  #plate .word { position: absolute; left: 96px; top: 6px; font-family: "Barlow Condensed"; font-weight: 800; font-size: 190px; line-height: 190px; color: var(--ink); letter-spacing: 4px; }
+  #plate .word span { display: inline-block; }
+  #plate .pglint { position: absolute; top: -20px; width: 90px; height: 240px; background: linear-gradient(100deg, transparent, rgba(255,255,255,.7), transparent); }
+  #bugtxt { left: 806px; top: 336px; width: 200px; text-align: right; font-size: 20px; color: var(--gold); }
+  .band { position: absolute; top: 0; height: 1920px; }
+  #endcard .slant { position: absolute; left: -200px; top: 0; width: 1480px; height: 1920px; background: var(--acc); transform-origin: 0 0; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="scenes"></div>
+  <div id="endcard" class="scene" style="display:none">
+    <div class="slant"></div>
+    <div id="endA" class="abs" style="left:60px;right:60px;top:1010px;text-align:center">
+      <div class="cn9" style="font-size:64px;color:var(--ink)">Lam Research · 9月季度拆解</div>
+      <div class="bc6" style="font-size:40px;color:var(--olive);font-style:italic;margin-top:8px;letter-spacing:2px">LAM RESEARCH · FQ1 FY27 BRIEFING</div>
+      <div style="height:6px;width:220px;background:var(--ink);margin:46px auto 40px"></div>
+      <div style="font-size:38px;color:var(--ink)">个人研究笔记 · 不构成投资建议</div>
+      <div class="mono" style="font-size:20px;color:var(--olive);margin-top:22px;line-height:1.6">SOURCES: LAM 8-K · I/O FUND 2026-10-22<br>研报作者及基金披露持有 LRCX</div>
+    </div>
+  </div>
+  <div id="plate" class="abs">
+    <div class="pg"><div class="b1"></div><div class="b2"></div><div class="pglint" id="pglint"></div></div>
+    <div class="word" id="word"><span>L</span><span>R</span><span>C</span><span>X</span></div>
+  </div>
+  <div id="bugtxt" class="abs mono">研报拆解 BRIEF</div>
+  <div id="slashes"></div>
+  <div id="bandWrap"></div>
+</div>
+<script>
+window.ready = false;
+const TL = /*TIMELINE*/null;
+const SC = TL.scenes, CAP = TL.captions, DUR = TL.duration;
+const C = i => CAP[i].t0, CE = i => CAP[i].t1;
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const ease = x => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+const backOut = x => { x = clamp(x); const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const lin = (t, a, b) => clamp((t - a) / (b - a));
+function spring(x, w = 15, z = .74) {
+  if (x <= 0) return 0;
+  const wd = w * Math.sqrt(1 - z * z);
+  return 1 - Math.exp(-z * w * x) * (Math.cos(wd * x) + (z * w / wd) * Math.sin(wd * x));
+}
+const rng = s => { const x = Math.sin(s * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+function shake(t, t0, amp = 14, d = .35) {
+  const k = lin(t, t0, t0 + d); if (k <= 0 || k >= 1) return [0, 0];
+  const f = Math.floor(t * 60), a = amp * (1 - k);
+  return [(rng(f) - .5) * 2 * a, (rng(f + 9) - .5) * 2 * a];
+}
+function el(tag, cls, css, html, parent) {
+  const e = document.createElement(tag); if (cls) e.className = cls; if (css) e.style.cssText = css; if (html != null) e.innerHTML = html;
+  (parent || document.body).appendChild(e); return e;
+}
+function show(e, on) { e.style.display = on ? '' : 'none'; }
+function popIn(e, t, t0, dy = 40, w = 16) {
+  const s = spring(t - t0, w, .78); e.style.opacity = clamp(s * 2.5); e.style.transform = `translateY(${(1 - s) * dy}px)`; return s;
+}
+function stampIn(e, t, t0, rot = -8, ring) {
+  const k = lin(t, t0, t0 + .16), s = 1.9 - .9 * ease(k);
+  e.style.opacity = t >= t0 ? 1 : 0; e.style.transform = `rotate(${rot}deg) scale(${s})`;
+  if (ring) { const r = lin(t, t0 + .14, t0 + .6); ring.style.opacity = r > 0 && r < 1 ? (1 - r) : 0; ring.style.transform = `scale(${.6 + 1.4 * r})`; }
+}
+function roll(v0, v1, t, t0, d = .8, dp = 1) { return (v0 + (v1 - v0) * ease(lin(t, t0, t0 + d))).toFixed(dp); }
+
+// ── 翻牌板 ───────────────────────────────────────
+function makeFlap(parent, x, y, n, w, h, fs) {
+  const tiles = [];
+  for (let i = 0; i < n; i++) {
+    const tl = el('div', 'tile', `left:${x + i * (w + 14)}px;top:${y}px;width:${w}px;height:${h}px`, null, parent);
+    const mk = (top) => {
+      const d = el('div', 'half', `top:${top ? 0 : h / 2}px;height:${h / 2}px;${top ? 'border-radius:12px 12px 0 0' : 'border-radius:0 0 12px 12px'}`, null, tl);
+      const s = el('span', '', `top:${top ? 0 : -h / 2}px;height:${h}px;line-height:${h}px;font-size:${fs}px`, '', d);
+      return [d, s];
+    };
+    const st = mk(true), sb = mk(false), ft = mk(true), fb = mk(false);
+    ft[0].style.transformOrigin = '50% 100%'; fb[0].style.transformOrigin = '50% 0';
+    el('div', 'seam', `top:${h / 2 - 2}px`, null, tl);
+    tiles.push({ st, sb, ft, fb });
+  }
+  return {
+    draw(t, a, b, tf) {
+      tiles.forEach((T, i) => {
+        const ca = a[i] || ' ', cb = b[i] || ' ';
+        const p = ca === cb ? 1 : lin(t, tf + i * .07, tf + i * .07 + .34);
+        T.st[1].textContent = p > 0 ? cb : ca; T.sb[1].textContent = p >= 1 ? cb : ca;
+        T.ft[1].textContent = ca; T.fb[1].textContent = cb;
+        T.ft[0].style.display = p > 0 && p < .5 ? '' : 'none';
+        T.ft[0].style.transform = `perspective(900px) rotateX(${-180 * p}deg)`;
+        T.ft[0].style.filter = `brightness(${1 - p})`;
+        T.fb[0].style.display = p >= .5 && p < 1 ? '' : 'none';
+        T.fb[0].style.transform = `perspective(900px) rotateX(${180 * (1 - p)}deg)`;
+      });
+    }
+  };
+}
+
+// ── 标题条（每个场景自带一套，跟着画面走） ──────────────────
+function makeStrap(parent, tab, items, srcM, srcC) {
+  const tabE = el('div', 'abs tab', '', `${tab[0]}<span class="en">${tab[1]}</span>`, parent);
+  const strap = el('div', 'abs strap', '', null, parent);
+  const lines = items.map(it => el('div', 'ln', '', `<div class="zh">${it.zh}</div><div class="en">${it.en}</div>`, strap));
+  const end = el('div', 'abs strapEnd bc', '', 'LRCX', parent);
+  const src = el('div', 'abs src', '', `<span class="m mono">${srcM}</span><span class="c">${srcC}</span>`, parent);
+  return {
+    draw(t, t0, tOut = 1e9) {
+      const inn = ease(lin(t, t0, t0 + .35)), out = ease(lin(t, tOut, tOut + .4));
+      const dx = -1100 * (1 - inn) - 1100 * out;
+      [tabE, strap, end].forEach(e => e.style.transform = `translateX(${dx}px)`);
+      src.style.opacity = .75 * inn * (1 - out);
+      let k = 0; items.forEach((it, i) => { if (t >= it.t) k = i; });
+      lines.forEach((ln, i) => {
+        let y = 150;
+        if (i === k) { const f = items[i].t > t0 + .01 ? ease(lin(t, items[i].t, items[i].t + .32)) : 1; y = 150 * (1 - f); }
+        else if (i === k - 1) { const f = ease(lin(t, items[k].t, items[k].t + .32)); y = -150 * f; }
+        ln.style.transform = `translateY(${y}px)`;
+      });
+    }
+  };
+}
+
+const root = $('scenes');
+const scenes = [];
+function scene(i, build) {
+  const s = el('div', 'scene', '', null, root);
+  el('div', 'streak', '', null, s);
+  const content = el('div', 'content', '', null, s);
+  el('div', 'abs dateline mono', '', 'LRCX · 2026.10.22 · FQ1 FY27', s);
+  const api = build(content, s);
+  scenes[i] = { el: s, content, ...api };
+}
+const tick = (sz = 76) => `<svg width="${sz}" height="${sz}" viewBox="0 0 76 76"><circle cx="38" cy="38" r="34" fill="none" stroke="#F2CF1D" stroke-width="5"/><path d="M22 39 L34 51 L55 27" fill="none" stroke="#F2CF1D" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>`;
+
+// ── 0 串联单 ─────────────────────────────────────
+scene(0, (c) => {
+  const date = el('div', 'abs', 'left:60px;top:380px', `<div class="bc" style="font-size:210px;line-height:190px;color:var(--acc)">22</div>`, c);
+  const dm = el('div', 'abs', 'left:300px;top:404px', `<div class="mono" style="font-size:34px;color:var(--paper)">OCT 2026 · THU</div><div style="font-size:44px;margin-top:14px" class="cn9">9月季度财报拆解</div><div class="bc6" style="font-size:30px;color:var(--gold);margin-top:6px;letter-spacing:1.5px">LAM RESEARCH · FQ1 FY27</div>`, c);
+  const rows = [['指引为什么放缓', 'WHY THE GUIDE SLOWED'], ['增长靠谁', 'WHO DROVE THE GROWTH'], ['利润和现金流', 'MARGINS & CASH FLOW'], ['先进封装', 'ADVANCED PACKAGING']]
+    .map(([zh, en], i) => {
+      const r = el('div', 'row', `top:${640 + i * 172}px`, `<div class="n">0${i + 1}</div><div class="zh">${zh}</div><div class="en">${en}</div><div class="glint"></div>`, c);
+      return r;
+    });
+  return {
+    draw(t) {
+      popIn(date, t, 1.7, 30); popIn(dm, t, 1.85, 30);
+      rows.forEach((r, i) => {
+        const t0 = C(2 + i) - .1, k = backOut(lin(t, t0, t0 + .32));
+        r.style.opacity = t >= t0 ? 1 : 0; r.style.transform = `perspective(1200px) rotateX(${(1 - k) * -90}deg)`;
+        r.querySelector('.glint').style.left = (-150 + 1300 * lin(t, t0 + .25, t0 + .7)) + 'px';
+      });
+    }
+  };
+});
+
+// ── 1 指引 ───────────────────────────────────────
+scene(1, (c, s) => {
+  const a = el('div', 'abs', 'inset:0', null, c), b = el('div', 'abs', 'inset:0', null, c);
+  const h1 = el('div', 'abs lbl', 'left:60px;top:400px', '环比增速<span class="en">QOQ REVENUE GROWTH</span>', a);
+  const flap = makeFlap(a, 60, 500, 5, 176, 300, 270);
+  const note1 = el('div', 'abs mono', 'left:60px;top:850px;font-size:26px;color:var(--gold)', 'FQ1 实际 ACTUAL → FQ2 指引 GUIDE', a);
+  const chip1 = el('div', 'abs chip', 'left:60px;top:930px', 'FQ2 指引 <b>$8.6B</b> ± 0.4', a);
+  const chip2 = el('div', 'abs chip', 'left:60px;top:1040px', '上季环比增量 <b>≈$1.5B</b> → 本季 <b>≈$0.38B</b>', a);
+  // 第二镜：约 4 亿从 12 月季度滑到 3 月季度
+  const qlab = el('div', 'abs lbl', 'left:60px;top:400px', '约 4 亿美元出货推迟<span class="en">SHIPMENTS SHIFT</span>', b);
+  const cols = [['12月季度', 'DEC QTR · FQ2', 140], ['3月季度', 'MAR QTR · FQ3', 600]].map(([zh, en, x]) => {
+    const box = el('div', 'abs', `left:${x}px;top:560px;width:340px;height:520px;border:4px dashed #4a4d52;box-sizing:border-box`, null, b);
+    el('div', 'abs', `left:${x}px;top:1100px;width:340px;text-align:center`, `<div style="font-size:40px">${zh}</div><div class="mono" style="font-size:22px;color:var(--gold);margin-top:6px">${en}</div>`, b);
+    return box;
+  });
+  const blk = el('div', 'abs', 'left:0;top:0;width:280px;height:200px;background:var(--acc);color:var(--ink);text-align:center', '<div class="bc" style="font-size:88px;line-height:150px">≈$0.4B</div><div class="mono" style="font-size:22px">DELAYED · 推迟</div>', b);
+  const st = el('div', 'abs stamp', 'left:170px;top:700px', '<div class="zh">缺件 ≠ 缺需求</div><div class="en">SUPPLY, NOT DEMAND</div>', b);
+  const ring = el('div', 'abs ring', 'left:290px;top:640px;width:500px;height:300px', null, b);
+  const strap = makeStrap(s, ['指引', 'GUIDANCE'], [
+    { t: SC[1].t0, zh: 'FQ2 指引 86 亿美元，环比仅 +4.6%', en: 'FQ2 GUIDE $8.6B, ONLY +4.6% QOQ' },
+    { t: C(9), zh: '约 4 亿收入推迟，3 月季度补回', en: '~$400M SLIPS TO THE MARCH QUARTER' }], 'SOURCE: I/O FUND · LAM CALL', '研报 · 电话会');
+  return {
+    draw(t) {
+      const cut = C(9); show(a, t < cut); show(b, t >= cut);
+      if (t < cut) {
+        popIn(h1, t, SC[1].t0 + .2);
+        flap.draw(t, '22.3%', ' 4.6%', C(7) + .1);
+        popIn(note1, t, C(7) + .5); popIn(chip1, t, C(6) + .2); popIn(chip2, t, C(7) + .9);
+        c.style.transform = `scale(${1 + .03 * lin(t, SC[1].t0, cut)})`;
+      } else {
+        c.style.transform = 'none';
+        popIn(qlab, t, cut + .05);
+        const e = spring(t - (cut + .15), 14, .8), mv = ease(lin(t, C(10) + .1, C(10) + .9));
+        const x = 170 + 460 * mv, y = 720 - 120 * Math.sin(Math.PI * mv);
+        blk.style.opacity = clamp(e * 3); blk.style.transform = `translate(${x}px, ${y}px) scale(${.6 + .4 * e})`;
+        cols[1].style.borderColor = mv >= 1 ? '#F2CF1D' : '#4a4d52';
+        stampIn(st, t, C(11), -8, ring);
+        const [sx, sy] = shake(t, C(11) + .1);
+        b.style.transform = `translate(${sx}px, ${sy}px)`;
+      }
+      strap.draw(t, SC[1].t0);
+    }
+  };
+});
+
+// ── 2 中国 ───────────────────────────────────────
+scene(2, (c, s) => {
+  const a = el('div', 'abs', 'inset:0', null, c), b = el('div', 'abs', 'inset:0', null, c);
+  const lab = el('div', 'abs lbl', 'left:60px;top:400px', '中国收入占比<span class="en">CHINA SHARE OF REVENUE</span>', a);
+  const flap = makeFlap(a, 60, 500, 3, 230, 330, 300);
+  const fq = el('div', 'abs mono', 'left:60px;top:870px;font-size:26px;color:var(--gold)', 'FQ4 26% → FQ1 35%', a);
+  const chip = el('div', 'abs chip', 'left:60px;top:950px', '本季收入 <b>$8.22B</b> · 环比 <b>+22%</b>', a);
+  // 第二镜：增量比例条
+  const card = el('div', 'abs card', 'left:60px;top:400px;width:960px;height:760px', null, b);
+  el('div', 'abs eyebrow mono', 'left:48px;top:40px', 'I/O FUND · 2026-10-22 · 环比增量拆分', card);
+  el('div', 'abs cn9', 'left:48px;top:90px;font-size:62px', '增量的 3/4 来自中国', card);
+  const rowA = el('div', 'abs lbl', 'left:48px;top:240px', '环比增量<span class="en">QOQ GAIN</span>', card);
+  const trA = el('div', 'abs track', 'left:48px;top:310px;width:864px', null, card);
+  const fA = el('div', 'abs fillb', 'left:48px;top:310px;width:0', null, card);
+  const vA = el('div', 'abs bc', 'left:700px;top:228px;font-size:64px', '', card);
+  const rowB = el('div', 'abs lbl', 'left:48px;top:420px', '中国<span class="en">CHINA</span>', card);
+  const trB = el('div', 'abs track', 'left:48px;top:490px;width:864px', null, card);
+  const fB = el('div', 'abs fillb', 'left:48px;top:490px;width:0;background:var(--acc)', null, card);
+  const vB = el('div', 'abs bc', 'left:700px;top:408px;font-size:64px;color:var(--acc)', '', card);
+  const badge = el('div', 'abs badge', 'left:740px;top:60px;width:180px;height:180px;line-height:180px;font-size:84px', '75%', card);
+  const ex = el('div', 'abs chip', 'left:48px;top:620px', '剔除中国 EX-CHINA 环比 <b>+7.4%</b>', card);
+  const strap = makeStrap(s, ['地区', 'CHINA'], [
+    { t: SC[2].t0, zh: '中国贡献约 3/4 环比增量', en: 'CHINA DROVE ~75% OF THE QOQ GAIN' }], 'SOURCE: I/O FUND · LAM 8-K', '研报 · 公司公告');
+  return {
+    draw(t) {
+      const cut = C(16) - .1; show(a, t < cut); show(b, t >= cut);
+      if (t < cut) {
+        popIn(lab, t, SC[2].t0 + .2); popIn(chip, t, C(13) + .2);
+        flap.draw(t, '26%', '35%', C(15) + 1.0); popIn(fq, t, C(15) + 1.4);
+        c.style.transform = 'none';
+      } else {
+        c.style.transform = `scale(${1 + .03 * lin(t, cut, SC[2].t1)})`;
+        const ga = ease(lin(t, cut + .1, cut + .8)), gb = ease(lin(t, cut + .5, cut + 1.3));
+        fA.style.width = 864 * ga + 'px'; vA.textContent = '$' + (1.50 * ga).toFixed(2) + 'B';
+        fB.style.width = 864 * .753 * gb + 'px'; vB.textContent = '$' + (1.13 * gb).toFixed(2) + 'B';
+        const bs = spring(t - (cut + 1.3), 16, .55); badge.style.opacity = clamp(bs * 3); badge.style.transform = `scale(${bs})`;
+        const dim = ease(lin(t, C(17), C(17) + .4)); fB.style.opacity = 1 - .7 * dim;
+        popIn(ex, t, C(18));
+      }
+      strap.draw(t, SC[2].t0);
+    }
+  };
+});
+
+// ── 3 系统业务 + 利润率 + 现金流 ─────────────────────────
+scene(3, (c, s) => {
+  const a = el('div', 'abs', 'inset:0', null, c), b = el('div', 'abs', 'inset:0', null, c), d = el('div', 'abs', 'inset:0', null, c);
+  el('div', 'abs lbl', 'left:60px;top:400px', '系统业务分市场<span class="en">SYSTEMS BY SEGMENT · $B</span>', a);
+  const BASE = 1160, U = 220;
+  const segs = [['NAND', 1.49, '+134%', '同比 YOY', 90], ['DRAM', 1.15, '+102%', '同比 YOY', 400], ['代工 FOUNDRY', 2.64, '+41%', '环比 QOQ', 710]].map(([n, v, g, gl, x], i) => {
+    const bar = el('div', 'barv', `left:${x}px;width:280px;top:${BASE}px;height:0;background:${i === 2 ? 'var(--acc)' : 'var(--paper)'}`, null, a);
+    const val = el('div', 'vlab bc', `left:${x}px;width:280px;font-size:58px`, '', a);
+    const bd = el('div', 'vlab', `left:${x}px;width:280px`, `<div class="bc" style="font-size:66px;color:var(--acc)">${g}</div><div class="mono" style="font-size:20px;color:var(--gold)">${gl}</div>`, a);
+    el('div', 'vlab', `left:${x}px;width:280px;top:${BASE + 20}px;font-size:34px`, n, a);
+    return { bar, val, bd, v, x };
+  });
+  // 利润率门槛
+  el('div', 'abs lbl', 'left:60px;top:400px', 'GAAP 营业利润率<span class="en">OPERATING MARGIN</span>', b);
+  const Y = v => 1160 - (v - 30) / 15 * 640;
+  const thr = el('div', 'abs', `left:60px;top:${Y(40) - 3}px;width:960px;height:0;border-top:6px dashed var(--gold)`, null, b);
+  el('div', 'abs mono', `left:700px;top:${Y(40) - 46}px;font-size:24px;color:var(--gold)`, '40% 门槛 THRESHOLD', b);
+  ['30%', '35%', '45%'].forEach(v => el('div', 'abs mono', `left:60px;top:${Y(parseFloat(v)) - 14}px;font-size:22px;color:#6c6a64`, v, b));
+  const col = el('div', 'barv', `left:380px;width:320px;top:${Y(30)}px;height:0`, null, b);
+  const num = el('div', 'abs bc', 'left:380px;width:320px;text-align:center;font-size:120px', '', b);
+  const ring = el('div', 'abs ring', `left:440px;top:${Y(40) - 100}px;width:200px;height:200px`, null, b);
+  const first = el('div', 'abs stamp', `left:610px;top:${Y(44) - 40}px`, '<div class="zh" style="font-size:48px">史上首次</div><div class="en" style="font-size:28px">FIRST TIME</div>', b);
+  // 现金流翻牌
+  el('div', 'abs lbl', 'left:60px;top:400px', '自由现金流利润率<span class="en">FCF MARGIN</span>', d);
+  const flap = makeFlap(d, 60, 500, 5, 176, 300, 270);
+  const fn = el('div', 'abs mono', 'left:60px;top:850px;font-size:26px;color:var(--gold)', '报告值 REPORTED → 剔除营运资本 EX-WORKING CAPITAL', d);
+  const fc = el('div', 'abs chip', 'left:60px;top:930px', '营运资本流入 <b>$535M</b> · 仍然优秀', d);
+  const strap = makeStrap(s, ['业绩', 'RESULTS'], [
+    { t: SC[3].t0, zh: 'NAND 同比 +134%，代工环比 +41%', en: 'NAND +134% YOY, FOUNDRY +41% QOQ' },
+    { t: C(22), zh: '营业利润率首次突破 40%', en: 'OPERATING MARGIN CROSSES 40%' },
+    { t: C(23), zh: '现金流含营运资本，剔除后约 33%', en: 'FCF MARGIN ~33% EX-WORKING CAPITAL' }], 'SOURCE: LAM 8-K · I/O FUND', '公司公告 · 研报');
+  return {
+    draw(t) {
+      const c1 = C(22) - .1, c2 = C(23) - .1;
+      show(a, t < c1); show(b, t >= c1 && t < c2); show(d, t >= c2);
+      c.style.transform = 'none';
+      if (t < c1) {
+        segs.forEach((g, i) => {
+          const t0 = i === 0 ? C(20) - .2 : i === 1 ? C(20) + .5 : C(21) - .1;
+          const k = ease(lin(t, t0, t0 + .7)), h = g.v * U * k;
+          g.bar.style.top = (BASE - h) + 'px'; g.bar.style.height = h + 'px';
+          g.val.style.top = (BASE - h - 76) + 'px'; g.val.textContent = (g.v * k).toFixed(2); g.val.style.opacity = k > 0 ? 1 : 0;
+          g.bd.style.top = Math.max(400, BASE - g.v * U - 220) + 'px'; popIn(g.bd, t, t0 + .6, 20);
+        });
+      } else if (t < c2) {
+        const v = 30 + 10 * ease(lin(t, c1 + .1, c1 + 1.2));
+        col.style.top = Y(v) + 'px'; col.style.height = (Y(30) - Y(v)) + 'px';
+        const hit = c1 + 1.2;
+        col.style.background = t >= hit ? 'var(--acc)' : 'var(--paper)';
+        num.style.top = (Y(v) - 150) + 'px'; num.textContent = v.toFixed(1) + '%';
+        num.style.color = t >= hit ? 'var(--acc)' : 'var(--paper)';
+        const r = lin(t, hit, hit + .5); ring.style.opacity = r > 0 && r < 1 ? 1 - r : 0; ring.style.transform = `scale(${.5 + 1.6 * r})`;
+        stampIn(first, t, hit + .35, -8);
+        const [sx, sy] = shake(t, hit, 16);
+        c.style.transform = `translate(${sx}px, ${sy}px) scale(${1 + .06 * ease(lin(t, c1, hit))})`;
+      } else {
+        flap.draw(t, '39.4%', ' ≈33%', C(24) + .3);
+        popIn(fn, t, C(24) + .7); popIn(fc, t, C(24) + 1.1);
+      }
+      strap.draw(t, SC[3].t0);
+    }
+  };
+});
+
+// ── 4 先进封装 ───────────────────────────────────
+scene(4, (c, s) => {
+  const a = el('div', 'abs', 'inset:0', null, c), b = el('div', 'abs', 'inset:0', null, c);
+  const card = el('div', 'abs card', 'left:60px;top:400px;width:960px;height:640px', null, a);
+  el('div', 'abs eyebrow mono', 'left:48px;top:40px', 'LAM 管理层 · 2026 全年增速 GROWTH', card);
+  el('div', 'abs cn9', 'left:48px;top:90px;font-size:62px', '先进封装跑赢系统业务', card);
+  const rows = [['先进封装', 'ADV. PACKAGING', 70, 'var(--acc)'], ['系统业务', 'SYSTEMS', 40, 'var(--paper)']].map(([zh, en, v, col], i) => {
+    el('div', 'abs lbl', `left:48px;top:${240 + i * 180}px`, `${zh}<span class="en">${en}</span>`, card);
+    el('div', 'abs track', `left:48px;top:${310 + i * 180}px;width:864px`, null, card);
+    const f = el('div', 'abs fillb', `left:48px;top:${310 + i * 180}px;width:0;background:${col}`, null, card);
+    const vv = el('div', 'abs bc', `left:720px;top:${228 + i * 180}px;font-size:64px`, '', card);
+    return { f, vv, v };
+  });
+  const st = el('div', 'abs stamp', 'left:300px;top:1090px', '<div class="zh">重申，非新增</div><div class="en">REAFFIRMED</div>', a);
+  const ring = el('div', 'abs ring', 'left:370px;top:1050px;width:400px;height:240px', null, a);
+  // CoWoS 示意
+  const tag = el('div', 'abs mono', 'left:60px;top:306px;height:44px;line-height:44px;padding:0 16px;background:var(--ink3);font-size:20px;color:var(--gold)', 'SCHEMATIC / 示意图', b);
+  el('div', 'abs lbl', 'left:60px;top:400px', 'CoWoS 封装变大<span class="en">LARGER INTERPOSER</span>', b);
+  const ip = el('div', 'abs', 'border:5px solid var(--gold);box-sizing:border-box;background:#17191d', null, b);
+  const dies = [0, 1].map(() => el('div', 'abs', 'background:var(--ink3);border-top:8px solid var(--acc);box-sizing:border-box;display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;font-size:30px;color:var(--gold);letter-spacing:6px', '计算芯片', b));
+  const hbm = Array.from({ length: 12 }, () => el('div', 'abs', 'background:var(--paper);border-radius:6px;color:var(--ink);font-family:Barlow Condensed;font-weight:800;font-size:24px;text-align:center;display:flex;align-items:center;justify-content:center', 'HBM', b));
+  const cap1 = el('div', 'abs', 'left:60px;top:1150px', '<span class="bc" style="font-size:70px">3.5× → 5.5×</span><span class="mono" style="font-size:22px;color:var(--gold);margin-left:16px">光罩尺寸 RETICLE</span>', b);
+  const cnt = el('div', 'abs bc', 'left:640px;top:1150px;font-size:70px;color:var(--acc)', '', b);
+  const strap = makeStrap(s, ['封装', 'PACKAGING'], [
+    { t: SC[4].t0, zh: '先进封装 +70%：重申，非新增', en: 'ADV. PACKAGING +70%, REAFFIRMED' },
+    { t: C(28), zh: '封装越大，沉积和刻蚀步骤越多', en: 'BIGGER PACKAGES, MORE DEP & ETCH' }], 'SOURCE: I/O FUND · LAM CALL', '研报 · 电话会');
+  return {
+    draw(t) {
+      const cut = C(28) - .1; show(a, t < cut); show(b, t >= cut);
+      if (t < cut) {
+        c.style.transform = `scale(${1 + .03 * lin(t, SC[4].t0, cut)})`;
+        rows.forEach((r, i) => {
+          const k = ease(lin(t, C(25) + i * .5, C(25) + i * .5 + .8));
+          r.f.style.width = 864 * r.v / 100 * k + 'px'; r.vv.textContent = (i ? '~' : '+') + Math.round(r.v * k) + '%';
+        });
+        stampIn(st, t, C(26) + .2, -8, ring);
+      } else {
+        c.style.transform = `scale(${1 + .04 * lin(t, cut, SC[4].t1)})`;
+        const g = ease(lin(t, C(29) + .2, C(29) + 1.2));
+        const W = 520 + 300 * g, H = 380 + 200 * g, X = 540 - W / 2, Yc = 790, Y0 = Yc - H / 2;
+        ip.style.left = X + 'px'; ip.style.top = Y0 + 'px'; ip.style.width = W + 'px'; ip.style.height = H + 'px';
+        popIn(ip, t, cut + .1, 30);
+        const dw = 130 + 30 * g, dh = H - 90;
+        dies.forEach((dd, i) => { dd.style.left = (540 - dw - 8 + i * (dw + 16)) + 'px'; dd.style.top = (Yc - dh / 2) + 'px'; dd.style.width = dw + 'px'; dd.style.height = dh + 'px'; popIn(dd, t, cut + .3, 30); });
+        const per = 4 + 2 * g;   // 每侧 4 → 6 颗
+        hbm.forEach((h, j) => {
+          const side = j % 2, idx = Math.floor(j / 2);          // 0..5
+          const appear = idx < 4 ? cut + .4 + idx * .08 : C(29) + .6 + (idx - 4) * .25;
+          const n = idx < 4 ? Math.max(4, per) : 6;
+          const slotH = (H - 60) / (idx < 4 ? per : 6), hh = slotH - 14;
+          const hx = side ? 540 + dw + 30 : 540 - dw - 30 - 110;
+          h.style.left = hx + 'px'; h.style.top = (Y0 + 30 + idx * slotH + 7) + 'px'; h.style.width = '110px'; h.style.height = hh + 'px';
+          const e = spring(t - appear, 18, .55); h.style.opacity = clamp(e * 3); h.style.transform = `scale(${e})`;
+          h.style.background = idx >= 4 ? 'var(--acc)' : 'var(--paper)';
+        });
+        popIn(cap1, t, C(29), 20);
+        cnt.textContent = 'HBM ×' + (t >= C(29) + 1.0 ? 12 : 8);
+        popIn(cnt, t, cut + .5, 20);
+      }
+      strap.draw(t, SC[4].t0);
+    }
+  };
+});
+
+// ── 5 结论 + 跟踪清单 ───────────────────────────────
+scene(5, (c, s) => {
+  const a = el('div', 'abs', 'inset:0', null, c), b = el('div', 'abs', 'inset:0', null, c);
+  el('div', 'abs lbl', 'left:60px;top:400px', '季度收入 · 亿美元<span class="en">QUARTERLY REVENUE</span>', a);
+  const BASE = 1180, U = 6.4;
+  const qs = [['9月', 'SEP', 82.2, 'actual'], ['12月', 'DEC · 指引', 86, 'guide'], ['3月', 'MAR', 90.7, 'need'], ['6月', 'JUN', 90.7, 'need']];
+  const bars = qs.map(([zh, en, v, kind], i) => {
+    const x = 90 + i * 232;
+    const bar = el('div', 'barv', `left:${x}px;width:190px;top:${BASE}px;height:0;box-sizing:border-box;` +
+      (kind === 'actual' ? 'background:var(--paper)' : kind === 'guide' ? 'background:transparent;border:5px solid var(--acc);border-bottom:0' : 'background:transparent;border:5px dashed var(--gold);border-bottom:0'), null, a);
+    const val = el('div', 'vlab bc', `left:${x}px;width:190px;font-size:54px;color:${kind === 'need' ? 'var(--gold)' : kind === 'guide' ? 'var(--acc)' : 'var(--paper)'}`, '', a);
+    el('div', 'vlab', `left:${x}px;width:190px;top:${BASE + 18}px`, `<div style="font-size:36px">${zh}</div><div class="mono" style="font-size:20px;color:var(--gold);margin-top:4px">${en}</div>`, a);
+    return { bar, val, v, kind };
+  });
+  const need = el('div', 'abs', `left:60px;top:${BASE - 90.7 * U - 3}px;width:960px;border-top:5px dashed var(--gold)`, null, a);
+  const needL = el('div', 'abs mono', `left:560px;top:${BASE - 90.7 * U - 170}px;font-size:24px;color:var(--gold);text-align:right;width:460px;line-height:1.5`, '下半财年季均需 ≈90.7 亿<br>FY27 CONSENSUS $34.95B', a);
+  const st = el('div', 'abs stamp', 'left:190px;top:860px', '<div class="zh">作者持有 LRCX</div><div class="en">AUTHOR IS LONG</div>', a);
+  const ring = el('div', 'abs ring', 'left:250px;top:810px;width:580px;height:260px', null, a);
+  // 跟踪清单：串联单回来
+  el('div', 'abs', 'left:60px;top:380px', '<div class="bc" style="font-size:150px;line-height:150px;color:var(--acc)">NEXT</div><div class="cn9" style="font-size:52px;margin-top:6px">接下来看</div>', b);
+  const rows = [['1月下旬 Lam FQ2 财报', 'LAM FQ2 RESULTS · LATE JAN'], ['应用材料、KLA 缺件表述', 'PEERS ON COMPONENT SHORTAGES'], ['台积电 2027 资本开支', 'TSMC 2027 CAPEX GUIDE']]
+    .map(([zh, en], i) => el('div', 'row', `top:${660 + i * 172}px`, `<div class="n">0${i + 1}</div><div class="zh">${zh}</div><div class="en">${en}</div><div class="tick">${tick()}</div><div class="glint"></div>`, b));
+  const strap = makeStrap(s, ['结论', 'VERDICT'], [
+    { t: SC[5].t0, zh: '推迟而非取消，大体合理', en: 'DELAYED, NOT CANCELLED' },
+    { t: C(34), zh: '但下半财年季均需约 90 亿美元', en: 'H2 NEEDS ~$9.07B A QUARTER' },
+    { t: C(36), zh: '研报作者及基金持有 LRCX', en: 'THE AUTHOR AND FUND OWN LRCX' }], 'SOURCE: I/O FUND · CONSENSUS', '研报 · 一致预期');
+  return {
+    draw(t) {
+      const cut = C(38) - .1; show(a, t < cut); show(b, t >= cut);
+      if (t < cut) {
+        c.style.transform = `scale(${1.04 - .04 * ease(lin(t, SC[5].t0, C(35) + 1.5))})`;
+        bars.forEach((g, i) => {
+          const t0 = g.kind === 'actual' ? SC[5].t0 + .3 : g.kind === 'guide' ? SC[5].t0 + .6 : C(35) + (i - 2) * .3;
+          const k = ease(lin(t, t0, t0 + .8)), h = g.v * U * k;
+          g.bar.style.top = (BASE - h) + 'px'; g.bar.style.height = h + 'px';
+          g.val.style.top = (BASE - h + (g.kind === 'need' ? 20 : -72)) + 'px'; g.val.textContent = (g.kind === 'need' ? '≈' : '') + (g.v * k).toFixed(g.v % 1 ? 1 : 0);
+          g.val.style.opacity = k > 0 ? 1 : 0;
+        });
+        const nk = ease(lin(t, C(35) + .6, C(35) + 1.2));
+        need.style.clipPath = `inset(0 ${100 - 100 * nk}% 0 0)`; needL.style.opacity = nk;
+        stampIn(st, t, C(36) + .1, -7, ring);
+        const [sx, sy] = shake(t, C(36) + .2, 12); a.style.transform = `translate(${sx}px, ${sy}px)`;
+      } else {
+        c.style.transform = 'none';
+        rows.forEach((r, i) => {
+          const t0 = C(38 + i) - .05, k = backOut(lin(t, t0, t0 + .32));
+          r.style.opacity = t >= t0 ? 1 : 0; r.style.transform = `perspective(1200px) rotateX(${(1 - k) * -90}deg)`;
+          r.querySelector('.glint').style.left = (-150 + 1300 * lin(t, t0 + .25, t0 + .7)) + 'px';
+          r.querySelector('path').style.strokeDashoffset = 1 - ease(lin(t, t0 + .5, t0 + .9));
+        });
+      }
+      strap.draw(t, SC[5].t0, C(38) - .1);
+    }
+  };
+});
+
+// ── 片头：两道斜线 + 品牌板砸入 → 飞成台标 ─────────────────────
+const slashes = [0, 1].map(i => el('div', 'abs', `left:0;top:0;width:90px;height:2600px;background:${i ? 'var(--gold)' : 'var(--acc)'};transform-origin:0 0`, null, $('slashes')));
+const pringE = el('div', 'abs ring', 'left:240px;top:760px;width:600px;height:400px', null, $('slashes'));
+const sdate = el('div', 'abs mono', 'left:0;right:0;top:1090px;text-align:center;font-size:30px;color:var(--gold)', '9月季度财报拆解 · FQ1 FY27 · 2026.10.22', $('slashes'));
+const band = el('div', 'band', 'width:103px', '<div style="position:absolute;left:0;top:0;width:84px;height:1920px;background:#F2CF1D"></div><div style="position:absolute;left:84px;top:0;width:5px;height:1920px;background:#121417"></div><div style="position:absolute;left:89px;top:0;width:14px;height:1920px;background:#D4B064"></div>', $('bandWrap'));
+const BUG = { x: 860, y: 262, s: .27 };
+const letters = [...document.querySelectorAll('#word span')];
+
+window.render = function (t) {
+  // 场景与擦除（色带从左往右扫过，左边是新场景）
+  let cur = SC.findIndex(s => t >= s.t0 && t < s.t1); if (cur < 0) cur = SC.length - 1;
+  let bx = null, prev = -1;
+  for (let i = 1; i < SC.length; i++) {
+    const c0 = SC[i].t0;
+    if (t >= c0 - .15 && t < c0 + .15) { bx = -110 + 1300 * ease(lin(t, c0 - .15, c0 + .15)); cur = i; prev = i - 1; }
+  }
+  const endT = CE(40) + .35;
+  scenes.forEach((sc, i) => {
+    const vis = t < endT + .6 && (i === cur || i === prev);
+    sc.el.style.display = vis ? '' : 'none';
+    if (!vis) return;
+    if (bx !== null) sc.el.style.clipPath = i === cur ? `inset(0 ${Math.max(0, 1080 - bx)}px 0 0)` : `inset(0 0 0 ${Math.max(0, bx)}px)`;
+    else sc.el.style.clipPath = 'none';
+    sc.draw(i === prev ? Math.min(t, SC[i].t1 - .001) : t);
+  });
+  band.style.display = bx !== null ? '' : 'none'; if (bx !== null) band.style.transform = `translateX(${bx}px)`;
+
+  // 片头：0–1.9s
+  const plate = $('plate');
+  const sl = [.04, .10];
+  slashes.forEach((e, i) => {
+    const k = ease(lin(t, sl[i], sl[i] + .3));
+    e.style.display = t < 1.9 ? '' : 'none';
+    e.style.transform = `translate(${-300 + 1700 * k}px, -300px) rotate(20deg)`; e.style.opacity = 1 - lin(t, .6, .9);
+  });
+  const hit = .16, sx = shake(t, .3, 18, .4);
+  let px, py, ps;
+  if (t < 1.45) {
+    const k = backOut(lin(t, hit, .42)); ps = 1.6 - .6 * k;
+    px = 540 - 300 * ps + sx[0]; py = 860 - 100 * ps + sx[1];
+  } else if (t < endT) {
+    const f = ease(lin(t, 1.45, 1.9)); ps = 1 + (BUG.s - 1) * f;
+    px = 240 + (BUG.x - 240) * f; py = 760 + (BUG.y - 760) * f;
+  } else {
+    const f = backOut(lin(t, endT + .3, endT + .8)); ps = BUG.s + (1 - BUG.s) * f;
+    px = BUG.x + (240 - BUG.x) * f; py = BUG.y + (760 - BUG.y) * f;
+  }
+  plate.style.opacity = t >= hit ? 1 : 0;
+  plate.style.transform = `translate(${px}px, ${py}px) scale(${ps})`;
+  letters.forEach((L, i) => { const k = backOut(lin(t, .42 + i * .07, .42 + i * .07 + .22)); L.style.transform = `translateY(${(1 - k) * -120}px)`; L.style.opacity = t >= .42 + i * .07 ? 1 : (t > 1.9 ? 1 : 0); });
+  $('pglint').style.left = (-120 + 900 * lin(t, 1.05, 1.35)) + 'px';
+  const r = lin(t, hit + .1, hit + .6); pringE.style.opacity = r > 0 && r < 1 ? 1 - r : 0; pringE.style.transform = `scale(${.6 + 1.2 * r})`;
+  sdate.style.opacity = clamp((t - .8) * 4) * (1 - lin(t, 1.4, 1.6)); sdate.style.clipPath = `inset(0 ${50 - 50 * ease(lin(t, .8, 1.1))}% 0 ${50 - 50 * ease(lin(t, .8, 1.1))}%)`;
+  $('bugtxt').style.opacity = (t > 1.9 && t < endT) ? clamp((t - 1.9) * 4) : 0;
+  // 片头期间没有场景画面：场景 0 从 1.6s 起被一道色带擦进来
+  if (t < 1.75) {
+    const k = lin(t, 1.45, 1.75); const x0 = -110 + 1300 * ease(k);
+    scenes[0].el.style.clipPath = `inset(0 ${Math.max(0, 1080 - x0)}px 0 0)`;
+    band.style.display = k > 0 && k < 1 ? '' : 'none'; band.style.transform = `translateX(${x0}px)`;
+  }
+  // 片尾卡：斜向擦除
+  const ec = $('endcard');
+  ec.style.display = t >= endT ? '' : 'none';
+  if (t >= endT) {
+    const k = ease(lin(t, endT, endT + .45));
+    ec.querySelector('.slant').style.transform = `translateX(${-1500 + 1500 * k}px) skewX(-14deg)`;
+    popIn($('endA'), t, endT + .7, 40);
+  }
+};
+document.fonts.load('900 40px "Noto Sans SC"').then(() => Promise.all([
+  document.fonts.load('700 40px "Noto Sans SC"'), document.fonts.load('800 40px "Barlow Condensed"'),
+  document.fonts.load('600 40px "Barlow Condensed"'), document.fonts.load('500 20px "IBM Plex Mono"')]))
+  .then(() => document.fonts.ready).then(() => { window.render(0); window.ready = true; });
+</script>
+</body>
+</html>
