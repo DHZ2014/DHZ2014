@@ -7,6 +7,7 @@
 #   $env:RV_PROJECT_DIR = "D:\Finance Video"      # install only into that project's .claude\skills
 #   $env:RV_BRANCH = "ccr-e9f92caf-juoyyl"         # install from another branch (default: main)
 #   $env:RV_REPO_DIR = "D:\code\DHZ2014"           # where to keep the clone (default: %USERPROFILE%\DHZ2014)
+#   $env:RV_NO_PROMPT = "1"                         # do not ask for the MiniMax key (for non-interactive runs)
 #
 # Re-run any time to update. Messages are in English on purpose: Windows PowerShell 5 reads
 # scripts in the system code page, and Chinese text can turn into mojibake.
@@ -77,7 +78,11 @@ $env:PYTHONUTF8 = "1"; $env:PYTHONIOENCODING = "utf-8"
 Invoke-Python "$Dest\scripts\setup.py" --install
 
 # 5. MiniMax key for the voiceover
-if (-not [Environment]::GetEnvironmentVariable("MINIMAX_API_KEY", "User")) {
+if ($env:MINIMAX_API_KEY -and -not [Environment]::GetEnvironmentVariable("MINIMAX_API_KEY", "User")) {
+    [Environment]::SetEnvironmentVariable("MINIMAX_API_KEY", $env:MINIMAX_API_KEY, "User")
+}
+if ($env:RV_NO_PROMPT) { Write-Host "Skipping the MiniMax key prompt (RV_NO_PROMPT). Set it later: setx MINIMAX_API_KEY <key>" }
+elseif (-not [Environment]::GetEnvironmentVariable("MINIMAX_API_KEY", "User")) {
     Step "MiniMax API key (for the Chinese voiceover)"
     $k = Read-Host "Paste your MiniMax API key (Enter to skip)"
     if ($k) {
