@@ -71,7 +71,7 @@
   #bugtxt { left: 806px; top: 336px; width: 200px; text-align: right; font-size: 20px; color: var(--gold); }
   .band { position: absolute; top: 0; height: 1920px; }
   /* 烧进画面的字幕（config.burn_subs）：标题条下方，底部 220px 仍留给平台 UI */
-  #subs { position: absolute; left: 40px; right: 40px; top: 1588px; text-align: center; }
+  #subs { position: absolute; left: 40px; right: 40px; top: 1588px; text-align: center; transform-origin: 50% 0; }
   #subs .box { display: inline-block; background: rgba(18,20,23,.9); border-bottom: 5px solid var(--acc); padding: 8px 28px 10px;
     font-family: "Noto Sans SC"; font-weight: 900; font-size: 52px; line-height: 1.3; color: var(--paper); white-space: nowrap; }
   #subs .hl { color: var(--acc); font-family: "Barlow Condensed"; font-weight: 800; font-size: 60px; }
@@ -516,8 +516,10 @@ function drawSubs(t) {
   if (ci < 0) { box.style.opacity = 0; return; }
   const c = CAP[ci], e = spring(t - c.t0, 22, .8);
   box.innerHTML = `<span class="box">${c.text.replace(/([$≈~+]?[0-9][0-9.,]*(?:%|亿|B|×)?)/g, '<span class="hl">$1</span>')}</span>`;
+  // 长字幕自动缩到画面宽度以内（左右各留 40px）
+  const span = box.firstChild, fit = Math.min(1, 1000 / Math.max(1, span.offsetWidth));
   box.style.opacity = clamp(e * 2.5) * (1 - lin(t, c.t1 + .02, c.t1 + .2));
-  box.style.transform = `translateY(${(1 - e) * 20}px)`;
+  box.style.transform = `translateY(${(1 - e) * 20}px) scale(${fit})`;
 }
 
 window.render = function (t) {
